@@ -39,28 +39,20 @@ npx tsx scripts/export_data.ts
 ]
 ```
 
-## 3. 기타 추출 방법 (SQLite3 Tool)
+## 3. 기타 추출 방법 (psql / pgAdmin)
 
-스크립트를 사용할 수 없는 경우, SQLite CLI를 사용하여 CSV로 추출할 수 있습니다.
+스크립트를 사용할 수 없는 경우, PostgreSQL CLI(`psql`)를 사용하여 CSV로 추출할 수 있습니다.
 
 ```bash
-# sqlite3 접속
-sqlite3 prisma/dev.db
+# psql 접속 (.env의 DATABASE_URL 사용)
+psql "postgres://user:password@host:5432/dbname"
 
-# CSV 모드 설정
-.headers on
-.mode csv
-
-# 게시글 추출
-.output exports/posts.csv
-SELECT id, title, content, views, createdAt FROM Post;
-
-# 댓글 추출
-.output exports/comments.csv
-SELECT id, postId, content, createdAt FROM Comment;
+# CSV 추출
+\COPY (SELECT id, title, content, views, "createdAt" FROM "Post") TO 'exports/posts.csv' WITH CSV HEADER;
+\COPY (SELECT id, "postId", content, "createdAt" FROM "Comment") TO 'exports/comments.csv' WITH CSV HEADER;
 
 # 종료
-.quit
+\q
 ```
 
 ## 4. 데이터 활용 정책

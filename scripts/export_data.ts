@@ -4,9 +4,6 @@ import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 
-const dbUrl = process.env.DATABASE_URL || "file:./prisma/dev.db";
-console.log("Using Database URL:", dbUrl);
-
 const prisma = new PrismaClient();
 
 async function main() {
