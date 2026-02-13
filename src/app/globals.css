@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ===== DungGeunMo (둥근모꼴) Pixel Font ===== */
+@font-face {
+  font-family: 'DungGeunMo';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Tailwind v4 Theme ===== */
+@theme inline {
+  --color-terminal-bg: #0000AA;
+  --color-terminal-bg-dark: #000080;
+  --color-terminal-text: #FFFFFF;
+  --color-terminal-highlight: #FFFF00;
+  --color-terminal-cyan: #00FFFF;
+  --color-terminal-green: #00FF00;
+  --color-terminal-red: #FF5555;
+  --color-terminal-magenta: #FF55FF;
+  --color-terminal-gray: #AAAAAA;
+  --color-terminal-darkgray: #555555;
+  --color-terminal-border: #5555FF;
+  --color-terminal-selection: #5555FF;
+  --font-terminal: 'DungGeunMo', 'Courier New', monospace;
+}
+
+/* ===== Reset & Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-terminal);
+  background: #000000;
+  color: var(--color-terminal-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--color-terminal-selection);
+  color: var(--color-terminal-text);
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-terminal-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-terminal-border);
+  border: 2px solid var(--color-terminal-bg-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-terminal-cyan);
+}
+
+/* ===== CRT Scanline Effect ===== */
+.crt-effect::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.15) 0px,
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 3px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.crt-effect::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.35) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ===== Blinking Cursor ===== */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* ===== Text Typing ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+/* ===== Screen Glow ===== */
+@keyframes screenGlow {
+
+  0%,
+  100% {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+
+  50% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.screen-glow {
+  animation: screenGlow 4s ease-in-out infinite;
+}
+
+/* ===== Responsive Font Sizes ===== */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 18px;
+  }
+}
