@@ -12,7 +12,7 @@
 /* ===== Tailwind v4 Theme ===== */
 @theme inline {
   --color-terminal-bg: #0000AA;
-  --color-terminal-bg-dark: #000080;
+  --color-terminal-bg-dark: #000000;
   --color-terminal-text: #FFFFFF;
   --color-terminal-highlight: #FFFF00;
   --color-terminal-cyan: #00FFFF;
@@ -56,12 +56,12 @@ body {
   color: var(--color-terminal-text);
 }
 
-/* ===== Dimmed Theme (Eye Comfort) ===== */
+/* ===== Dimmed Theme (Eye Comfort - Black) ===== */
 .dimmed {
-  --color-terminal-bg: #000055 !important;
-  --color-terminal-bg-dark: #000033 !important;
-  --color-terminal-border: #333399 !important;
-  --color-terminal-selection: #333399 !important;
+  --color-terminal-bg: #000000 !important;
+  --color-terminal-bg-dark: #111111 !important;
+  --color-terminal-border: #333333 !important;
+  --color-terminal-selection: #333333 !important;
 }
 
 .dimmed .crt-effect::before {
