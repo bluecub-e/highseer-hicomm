@@ -1,6 +1,6 @@
 {
   "name": "highseerhicomm",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "export-data": "npx tsx scripts/export_data.ts",
+    "postinstall": "prisma generate",
     "lint": "eslint"
   },
   "dependencies": {
