@@ -45,7 +45,8 @@ type Screen =
   | { type: "login" }
   | { type: "login" }
   | { type: "signup" }
-  | { type: "terms" };
+  | { type: "terms" }
+  | { type: "myinfo" };
 
 const POSTS_PER_PAGE = 10;
 
@@ -167,6 +168,20 @@ export default function Home() {
     setUser(null);
     setNotification("로그아웃 되었습니다.");
     setScreen({ type: "main" });
+  }, []);
+
+  const handleWithdraw = useCallback(async () => {
+    if (!confirm("정말로 탈퇴하시겠습니까? \n탈퇴 시 작성한 글과 댓글은 '탈퇴한 회원'으로 표시되며 복구할 수 없습니다.")) {
+      return;
+    }
+    const res = await fetch("/api/auth/withdraw", { method: "DELETE" });
+    if (res.ok) {
+      setUser(null);
+      setNotification("회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.");
+      setScreen({ type: "main" });
+    } else {
+      setNotification("탈퇴 처리에 실패했습니다.");
+    }
   }, []);
 
   // ===== Post/Comment Handlers =====
@@ -459,6 +474,14 @@ export default function Home() {
           {screen.type === "help" && <HelpScreen user={user} />}
           {screen.type === "about" && <AboutScreen />}
           {screen.type === "terms" && <TermsScreen onBack={() => setScreen({ type: "main" })} />}
+          {screen.type === "myinfo" && user && (
+            <MyInfoScreen
+              user={user}
+              onLogout={handleLogout}
+              onWithdraw={handleWithdraw}
+              onBack={() => setScreen({ type: "main" })}
+            />
+          )}
         </main>
 
         <CommandInput onCommand={handleCommand} isAdmin={user?.isAdmin || false} dimmed={dimmed} />
@@ -527,6 +550,9 @@ function MainMenuScreen({
         <MenuItem number="2" label="하이컴 안내" onClick={() => onNavigate({ type: "about" })} />
         <MenuItem number="3" label="도움말" onClick={() => onNavigate({ type: "help" })} />
         <MenuItem number="4" label="이용약관" onClick={() => onNavigate({ type: "terms" })} />
+        {user && (
+          <MenuItem number="5" label="내 정보" onClick={() => onNavigate({ type: "myinfo" })} />
+        )}
       </div>
 
       <Divider />
@@ -1277,6 +1303,74 @@ function TermsScreen({ onBack }: { onBack: () => void }) {
           className="text-terminal-cyan hover:text-terminal-highlight"
         >
           [B] 뒤로가기 (또는 ESC)
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ===== My Info Screen =====
+function MyInfoScreen({
+  user,
+  onLogout,
+  onWithdraw,
+  onBack,
+}: {
+  user: User;
+  onLogout: () => void;
+  onWithdraw: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <div className="animate-fade-in">
+      <SectionTitle>═══ 내 정 보 ═══</SectionTitle>
+      <Divider />
+
+      <div className="my-6 space-y-4">
+        <div>
+          <label className="text-terminal-cyan text-sm block mb-1">닉네임</label>
+          <div className="text-terminal-highlight text-lg font-bold">
+            {user.nickname}
+          </div>
+        </div>
+        <div>
+          <label className="text-terminal-cyan text-sm block mb-1">아이디</label>
+          <div className="text-terminal-text">
+            {user.username}
+          </div>
+        </div>
+        <div>
+          <label className="text-terminal-cyan text-sm block mb-1">권한</label>
+          <div className="text-terminal-text">
+            {user.isAdmin ? <span className="text-terminal-red">관리자</span> : "일반 회원"}
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      <div className="flex flex-col gap-3 text-sm">
+        <button
+          onClick={onLogout}
+          className="text-terminal-yellow hover:text-terminal-highlight text-left"
+        >
+          [로그아웃]
+        </button>
+        <button
+          onClick={onWithdraw}
+          className="text-terminal-red hover:text-terminal-highlight text-left"
+        >
+          [회원탈퇴]
+        </button>
+      </div>
+
+      <Divider />
+      <div className="mt-2">
+        <button
+          onClick={onBack}
+          className="text-terminal-cyan hover:text-terminal-highlight"
+        >
+          [B] 뒤로가기
         </button>
       </div>
     </div>

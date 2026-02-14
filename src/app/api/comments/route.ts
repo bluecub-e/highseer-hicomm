@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
         comments: comments.map((c) => ({
             id: c.id,
             content: c.content,
-            author: c.author.nickname,
-            authorId: c.author.id,
+            author: c.author?.nickname || "탈퇴한 회원",
+            authorId: c.author?.id || -1,
             date: c.createdAt.toISOString().split("T")[0],
         })),
     });
@@ -61,8 +61,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
         id: comment.id,
         content: comment.content,
-        author: comment.author.nickname,
-        authorId: comment.author.id,
+        author: comment.author?.nickname || "알 수 없음",
+        authorId: comment.author?.id || -1,
         date: comment.createdAt.toISOString().split("T")[0],
     });
 }
