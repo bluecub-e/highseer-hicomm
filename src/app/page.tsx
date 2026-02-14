@@ -1269,13 +1269,13 @@ function TermsScreen({ onBack }: { onBack: () => void }) {
         <div className="border border-terminal-darkgray bg-terminal-bg-dark p-3">
           <h3 className="text-terminal-highlight font-bold mb-2">[데이터 활용 안내]</h3>
           <p className="mb-2">
-            1. 본 커뮤니티에 작성된 게시글 및 댓글 데이터는 (주)하이시어의
+            1. 본 커뮤니티에 작성된 게시글 및 댓글 데이터는 별도
             <span className="text-terminal-cyan font-bold"> &apos;모의 주식 시뮬레이터&apos; </span>
-            프로젝트의 시장 반응 분석 및 감성 분석 데이터로 활용될 수 있습니다.
+            프로젝트의 분석 데이터로 활용될 수 있습니다.
           </p>
           <p>
             2. 활용되는 데이터에서 사용자의 개인 식별 정보(비밀번호, 이메일, 아이디 등)는
-            <span className="text-terminal-red"> 철저히 배제</span>되며, 오직 공개된 데이터(닉네임, 작성 내용, 날짜, 조회수)만이
+            <span className="text-terminal-red"> 배제</span>되며, 오직 공개된 데이터(닉네임, 작성 내용, 날짜, 조회수)만이
             분석 목적으로 사용됩니다.
           </p>
           <p className="mt-2">
@@ -1330,7 +1330,7 @@ function PrivacyScreen({ onBack }: { onBack: () => void }) {
           <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
             <li>회원 가입 및 관리 (본인 식별, 가입 의사 확인)</li>
             <li>서비스 제공 및 커뮤니티 운영</li>
-            <li>&apos;모의 주식 시뮬레이터&apos; 프로젝트 데이터 분석 (익명화 처리 후 사용)</li>
+            <li>&apos;모의 주식 시뮬레이터&apos; 프로젝트 데이터 분석</li>
           </ul>
         </div>
 
@@ -1353,7 +1353,12 @@ function PrivacyScreen({ onBack }: { onBack: () => void }) {
         </div>
 
         <div>
-          <h3 className="text-terminal-cyan font-bold mb-1">4. 정보주체의 권리·의무 및 그 행사 방법</h3>
+          <h3 className="text-terminal-cyan font-bold mb-1">4. 개인정보의 제3자 제공</h3>
+          <p>회사는 정보주체의 개인정보를 제1조(개인정보의 처리 목적)에서 명시한 범위 내에서만 처리하며, 정보주체의 동의, 법률의 특별한 규정 등 「개인정보 보호법」 제17조 및 제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.</p>
+        </div>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">5. 정보주체의 권리·의무 및 그 행사 방법</h3>
           <p>이용자는 개인정보주체로서 다음과 같은 권리를 행사할 수 있습니다.</p>
           <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
             <li>자신의 개인정보 조회 및 수정 (내 정보 메뉴)</li>
@@ -1362,7 +1367,7 @@ function PrivacyScreen({ onBack }: { onBack: () => void }) {
         </div>
 
         <div>
-          <h3 className="text-terminal-cyan font-bold mb-1">5. 개인정보의 파기</h3>
+          <h3 className="text-terminal-cyan font-bold mb-1">6. 개인정보의 파기</h3>
           <p>회사는 원칙적으로 개인정보 처리목적이 달성된 경우에는 지체 없이 해당 개인정보를 파기합니다. 파기의 절차, 기한 및 방법은 다음과 같습니다.</p>
           <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
             <li>파기절차: 이용자가 입력한 정보는 목적 달성 후 즉시 DB에서 삭제됩니다.</li>
