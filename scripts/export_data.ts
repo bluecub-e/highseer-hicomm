@@ -48,9 +48,9 @@ async function main() {
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
         author: {
-            id: post.author.id,
-            nickname: post.author.nickname,
-            isAdmin: post.author.isAdmin
+            id: post.author?.id || -1,
+            nickname: post.author?.nickname || "탈퇴한 회원",
+            isAdmin: post.author?.isAdmin || false
         },
         comments: post.comments.map(comment => ({
             id: comment.id,
@@ -58,8 +58,8 @@ async function main() {
             content: comment.content,
             createdAt: comment.createdAt,
             author: {
-                id: comment.author.id,
-                nickname: comment.author.nickname
+                id: comment.author?.id || -1,
+                nickname: comment.author?.nickname || "탈퇴한 회원"
             }
         }))
     }));
