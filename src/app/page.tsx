@@ -58,6 +58,30 @@ export default function Home() {
   const [notification, setNotification] = useState("");
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // ===== History Integration =====
+  const handleNavigate = useCallback((newScreen: Screen) => {
+    setScreen(newScreen);
+    window.history.pushState(newScreen, "", "");
+  }, []);
+
+  useEffect(() => {
+    // Initial state replacement to ensure we have a state to pop back to
+    window.history.replaceState({ type: "main" }, "", "");
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state) {
+        // Restore screen from history state
+        setScreen(event.state);
+      } else {
+        // Fallback to main if no state (shouldn't happen with replaceState above, but safe fallback)
+        setScreen({ type: "main" });
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   // Auth state
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -142,7 +166,7 @@ export default function Home() {
     if (res.ok) {
       setUser(data.user);
       setNotification(`환영합니다, ${data.user.nickname}님!`);
-      setScreen({ type: "main" });
+      handleNavigate({ type: "main" });
     } else {
       setNotification(data.error || "로그인 실패");
     }
@@ -158,7 +182,7 @@ export default function Home() {
     if (res.ok) {
       setUser(data.user);
       setNotification(`가입 완료! 환영합니다, ${data.user.nickname}님!`);
-      setScreen({ type: "main" });
+      handleNavigate({ type: "main" });
     } else {
       setNotification(data.error || "회원가입 실패");
     }
@@ -168,7 +192,7 @@ export default function Home() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
     setNotification("로그아웃 되었습니다.");
-    setScreen({ type: "main" });
+    handleNavigate({ type: "main" });
   }, []);
 
   const handleWithdraw = useCallback(async () => {
@@ -190,7 +214,7 @@ export default function Home() {
     const res = await fetch(`/api/posts/${postId}`, { method: "DELETE" });
     if (res.ok) {
       setNotification("✓ 게시글이 삭제되었습니다.");
-      setScreen({ type: "board", boardId: "free", page: 1 });
+      handleNavigate({ type: "board", boardId: "free", page: 1 });
     } else {
       const data = await res.json();
       setNotification(data.error || "삭제 실패");
@@ -248,7 +272,7 @@ export default function Home() {
     });
     if (res.ok) {
       setNotification("✓ 글이 등록되었습니다!");
-      setScreen({ type: "board", boardId, page: 1 });
+      handleNavigate({ type: "board", boardId, page: 1 });
     } else {
       const data = await res.json();
       setNotification(data.error || "글 등록 실패");
@@ -283,26 +307,26 @@ export default function Home() {
 
       // Global navigation
       if (c === "m" || c === "메인" || c === "홈") {
-        setScreen({ type: "main" });
+        handleNavigate({ type: "main" });
         return;
       }
       if (c === "b" || c === "뒤로" || c === "back") {
-        goBack();
+        window.history.back();
         return;
       }
       if (c === "h" || c === "도움" || c === "help" || c === "?") {
-        setScreen({ type: "help" });
+        handleNavigate({ type: "help" });
         return;
       }
       if (c === "terms" || c === "약관" || c === "이용약관" || c === "4") {
-        setScreen({ type: "terms" });
+        handleNavigate({ type: "terms" });
         return;
       }
       if (c === "login" || c === "로그인") {
         if (user) {
           setNotification("이미 로그인되어 있습니다.");
         } else {
-          setScreen({ type: "login" });
+          handleNavigate({ type: "login" });
         }
         return;
       }
@@ -310,7 +334,7 @@ export default function Home() {
         if (user) {
           setNotification("이미 로그인되어 있습니다.");
         } else {
-          setScreen({ type: "signup" });
+          handleNavigate({ type: "signup" });
         }
         return;
       }
@@ -323,13 +347,18 @@ export default function Home() {
       switch (screen.type) {
         case "main": {
           if (c === "1" || c === "게시판" || c === "자유게시판") {
-            setScreen({ type: "board", boardId: "free", page: 1 });
+            handleNavigate({ type: "board", boardId: "free", page: 1 });
           } else if (c === "2" || c === "안내" || c === "소개") {
-            setScreen({ type: "about" });
+            handleNavigate({ type: "about" });
           } else if (c === "3" || c === "도움" || c === "도움말") {
-            setScreen({ type: "help" });
+            handleNavigate({ type: "help" });
           } else if (c === "4" || c === "약관") {
-            setScreen({ type: "terms" });
+            handleNavigate({ type: "terms" });
+          } else if (c === "5" || c === "개인정보" || c === "개인정보처리방침") {
+            handleNavigate({ type: "privacy" });
+          } else if (c === "6" || c === "내정보" || c === "정보") {
+            if (user) handleNavigate({ type: "myinfo" });
+            else setNotification("로그인이 필요합니다.");
           } else {
             setNotification(`알 수 없는 명령어: "${cmd}" (도움말: H)`);
           }
@@ -338,22 +367,22 @@ export default function Home() {
         case "board": {
           if (c === "n" || c === "다음") {
             if (screen.page < boardTotalPages)
-              setScreen({ ...screen, page: screen.page + 1 });
+              handleNavigate({ ...screen, page: screen.page + 1 });
             else setNotification("마지막 페이지입니다.");
           } else if (c === "p" || c === "이전") {
             if (screen.page > 1)
-              setScreen({ ...screen, page: screen.page - 1 });
+              handleNavigate({ ...screen, page: screen.page - 1 });
             else setNotification("첫 번째 페이지입니다.");
           } else if (c === "w" || c === "글쓰기" || c === "write") {
             if (!user) {
               setNotification("로그인이 필요합니다. (로그인: login)");
             } else {
-              setScreen({ type: "write", boardId: screen.boardId });
+              handleNavigate({ type: "write", boardId: screen.boardId });
             }
           } else {
             const num = parseInt(c);
             if (!isNaN(num)) {
-              setScreen({ type: "post", postId: num });
+              handleNavigate({ type: "post", postId: num });
             } else {
               setNotification(`알 수 없는 명령어: "${cmd}"`);
             }
@@ -362,7 +391,8 @@ export default function Home() {
         }
         case "post": {
           if (c === "l" || c === "목록" || c === "list") {
-            setScreen({ type: "board", boardId: "free", page: 1 });
+            // List goes back to board. Pushing state is fine.
+            handleNavigate({ type: "board", boardId: "free", page: 1 });
           } else {
             setNotification(`"L"=목록, "B"=뒤로, "M"=메인`);
           }
@@ -425,12 +455,12 @@ export default function Home() {
           ref={contentRef}
           className="flex-1 overflow-y-auto px-4 sm:px-8 py-4"
         >
-          {screen.type === "main" && <MainMenuScreen onNavigate={setScreen} user={user} />}
+          {screen.type === "main" && <MainMenuScreen onNavigate={handleNavigate} user={user} />}
           {screen.type === "board" && (
             <BoardScreen
               boardId={screen.boardId}
               page={screen.page}
-              onNavigate={setScreen}
+              onNavigate={handleNavigate}
               posts={boardPosts}
               totalPages={boardTotalPages}
               total={boardTotal}
@@ -442,7 +472,7 @@ export default function Home() {
             currentPost ? (
               <PostScreen
                 post={currentPost}
-                onNavigate={setScreen}
+                onNavigate={handleNavigate}
                 user={user}
                 onDeletePost={deletePost}
                 onDeleteComment={deleteComment}
@@ -458,7 +488,7 @@ export default function Home() {
           {screen.type === "write" && (
             <WriteScreen
               boardId={screen.boardId}
-              onNavigate={setScreen}
+              onNavigate={handleNavigate}
               writeTitle={writeTitle}
               setWriteTitle={setWriteTitle}
               writeContent={writeContent}
@@ -467,21 +497,21 @@ export default function Home() {
             />
           )}
           {screen.type === "login" && (
-            <LoginScreen onLogin={handleLogin} onNavigate={setScreen} />
+            <LoginScreen onLogin={handleLogin} onNavigate={handleNavigate} />
           )}
           {screen.type === "signup" && (
-            <SignupScreen onSignup={handleSignup} onNavigate={setScreen} />
+            <SignupScreen onSignup={handleSignup} onNavigate={handleNavigate} />
           )}
           {screen.type === "help" && <HelpScreen user={user} />}
           {screen.type === "about" && <AboutScreen />}
-          {screen.type === "terms" && <TermsScreen onBack={() => setScreen({ type: "main" })} />}
-          {screen.type === "privacy" && <PrivacyScreen onBack={() => setScreen({ type: "main" })} />}
+          {screen.type === "terms" && <TermsScreen onBack={() => window.history.back()} />}
+          {screen.type === "privacy" && <PrivacyScreen onBack={() => window.history.back()} />}
           {screen.type === "myinfo" && user && (
             <MyInfoScreen
               user={user}
               onLogout={handleLogout}
               onWithdraw={handleWithdraw}
-              onBack={() => setScreen({ type: "main" })}
+              onBack={() => window.history.back()}
             />
           )}
         </main>
