@@ -394,7 +394,7 @@ export default function Home() {
   // ===== Render =====
   return (
     <div className={`flex items-center justify-center min-h-screen bg-black ${dimmed ? "dimmed" : ""}`}>
-      <div className="flex flex-col h-screen-safe w-full max-w-4xl border-x-2 border-terminal-border bg-terminal-bg">
+      <div className={`flex flex-col h-screen-safe w-full max-w-4xl border-x-2 ${dimmed ? "bg-black border-gray-800" : "bg-terminal-bg border-terminal-border"}`}>
         <StatusBar nickname={user?.nickname || null} dimmed={dimmed} onToggleDimmed={toggleDimmed} />
 
         {/* Notification Toast */}
@@ -461,7 +461,7 @@ export default function Home() {
           {screen.type === "terms" && <TermsScreen onBack={() => setScreen({ type: "main" })} />}
         </main>
 
-        <CommandInput onCommand={handleCommand} isAdmin={user?.isAdmin || false} />
+        <CommandInput onCommand={handleCommand} isAdmin={user?.isAdmin || false} dimmed={dimmed} />
       </div>
     </div>
   );
@@ -726,8 +726,8 @@ function SignupScreen({
             type="submit"
             disabled={!username || !password || !nickname || !agreed}
             className={`font-bold transition-colors ${!username || !password || !nickname || !agreed
-                ? "text-terminal-darkgray cursor-not-allowed"
-                : "text-terminal-green hover:text-terminal-highlight"
+              ? "text-terminal-darkgray cursor-not-allowed"
+              : "text-terminal-green hover:text-terminal-highlight"
               }`}
           >
             [가입]

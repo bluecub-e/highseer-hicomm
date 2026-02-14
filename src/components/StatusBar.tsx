@@ -25,7 +25,7 @@ export default function StatusBar({ nickname, dimmed, onToggleDimmed }: StatusBa
     }, []);
 
     return (
-        <header className="flex items-center justify-between px-2 sm:px-3 py-1.5 bg-terminal-bg-dark border-b-2 border-terminal-border text-sm select-none shrink-0">
+        <header className={`flex items-center justify-between px-2 sm:px-3 py-1.5 border-b-2 text-sm select-none shrink-0 ${dimmed ? "bg-gray-900 border-gray-800" : "bg-terminal-bg-dark border-terminal-border"}`}>
             <span className="text-terminal-cyan font-bold tracking-wider truncate">
                 <span className="hidden sm:inline">★ HiComm — (주)하이시어 ★</span>
                 <span className="sm:hidden">★ HiComm ★</span>

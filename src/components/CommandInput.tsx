@@ -6,9 +6,10 @@ interface CommandInputProps {
     onCommand: (cmd: string) => void;
     placeholder?: string;
     isAdmin?: boolean;
+    dimmed?: boolean;
 }
 
-export default function CommandInput({ onCommand, placeholder = "명령어를 입력하세요", isAdmin = false }: CommandInputProps) {
+export default function CommandInput({ onCommand, placeholder = "명령어를 입력하세요", isAdmin = false, dimmed = false }: CommandInputProps) {
     const [value, setValue] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,7 +29,7 @@ export default function CommandInput({ onCommand, placeholder = "명령어를 �
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex items-center gap-2 px-3 py-2 bg-terminal-bg-dark border-t-2 border-terminal-border shrink-0"
+            className={`flex items-center gap-2 px-3 py-2 border-t-2 shrink-0 ${dimmed ? "bg-gray-900 border-gray-800" : "bg-terminal-bg-dark border-terminal-border"}`}
             onClick={() => inputRef.current?.focus()}
         >
             <span className={`font-bold select-none ${isAdmin ? "text-terminal-red" : "text-terminal-green"}`}>
