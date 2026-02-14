@@ -55,6 +55,7 @@ export default function Home() {
   const [writeTitle, setWriteTitle] = useState("");
   const [writeContent, setWriteContent] = useState("");
   const [notification, setNotification] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   // ===== History Integration =====
@@ -130,6 +131,7 @@ export default function Home() {
   // ===== Fetch board posts when entering board screen =====
   useEffect(() => {
     if (screen.type === "board") {
+      setIsLoading(true);
       fetch(`/api/posts?boardId=${screen.boardId}&page=${screen.page}&limit=${POSTS_PER_PAGE}`)
         .then((r) => r.json())
         .then((data) => {
@@ -137,7 +139,8 @@ export default function Home() {
           setBoardTotal(data.total);
           setBoardTotalPages(data.totalPages);
         })
-        .catch(() => setNotification("게시글 목록을 불러올 수 없습니다."));
+        .catch(() => setNotification("게시글 목록을 불러올 수 없습니다."))
+        .finally(() => setIsLoading(false));
     }
   }, [screen]);
 
@@ -145,92 +148,128 @@ export default function Home() {
   useEffect(() => {
     if (screen.type === "post") {
       setCurrentPost(null);
+      setIsLoading(true);
       fetch(`/api/posts/${screen.postId}`)
         .then((r) => r.json())
         .then((data) => setCurrentPost(data))
-        .catch(() => setNotification("게시글을 불러올 수 없습니다."));
+        .catch(() => setNotification("게시글을 불러올 수 없습니다."))
+        .finally(() => setIsLoading(false));
     }
   }, [screen]);
 
   // ===== Auth Handlers =====
   const handleLogin = useCallback(async (username: string, password: string) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setUser(data.user);
-      setNotification(`환영합니다, ${data.user.nickname}님!`);
-      handleNavigate({ type: "main" });
-    } else {
-      setNotification(data.error || "로그인 실패");
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUser(data.user);
+        setNotification(`환영합니다, ${data.user.nickname}님!`);
+        handleNavigate({ type: "main" });
+      } else {
+        setNotification(data.error || "로그인 실패");
+      }
+    } catch (e) {
+      setNotification("연결 오류 발생");
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [handleNavigate]);
 
   const handleSignup = useCallback(async (username: string, password: string, nickname: string) => {
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, nickname }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setUser(data.user);
-      setNotification(`가입 완료! 환영합니다, ${data.user.nickname}님!`);
-      handleNavigate({ type: "main" });
-    } else {
-      setNotification(data.error || "회원가입 실패");
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, nickname }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUser(data.user);
+        setNotification(`가입 완료! 환영합니다, ${data.user.nickname}님!`);
+        handleNavigate({ type: "main" });
+      } else {
+        setNotification(data.error || "회원가입 실패");
+      }
+    } catch (e) {
+      setNotification("연결 오류 발생");
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [handleNavigate]);
 
   const handleLogout = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-    setNotification("로그아웃 되었습니다.");
-    handleNavigate({ type: "main" });
-  }, []);
+    setIsLoading(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      setNotification("로그아웃 되었습니다.");
+      handleNavigate({ type: "main" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleNavigate]);
 
   const handleWithdraw = useCallback(async () => {
     if (!confirm("정말로 탈퇴하시겠습니까? \n탈퇴 시 작성한 글과 댓글은 '탈퇴한 회원'으로 표시되며 복구할 수 없습니다.")) {
       return;
     }
-    const res = await fetch("/api/auth/withdraw", { method: "DELETE" });
-    if (res.ok) {
-      setUser(null);
-      setNotification("회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.");
-      handleNavigate({ type: "main" });
-    } else {
-      setNotification("탈퇴 처리에 실패했습니다.");
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/withdraw", { method: "DELETE" });
+      if (res.ok) {
+        setUser(null);
+        setNotification("회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.");
+        handleNavigate({ type: "main" });
+      } else {
+        setNotification("탈퇴 처리에 실패했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [handleNavigate]);
 
   // ===== Post/Comment Handlers =====
   const deletePost = useCallback(async (postId: number) => {
-    const res = await fetch(`/api/posts/${postId}`, { method: "DELETE" });
-    if (res.ok) {
-      setNotification("✓ 게시글이 삭제되었습니다.");
-      handleNavigate({ type: "board", boardId: "free", page: 1 });
-    } else {
-      const data = await res.json();
-      setNotification(data.error || "삭제 실패");
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/posts/${postId}`, { method: "DELETE" });
+      if (res.ok) {
+        setNotification("✓ 게시글이 삭제되었습니다.");
+        handleNavigate({ type: "board", boardId: "free", page: 1 });
+      } else {
+        const data = await res.json();
+        setNotification(data.error || "삭제 실패");
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [handleNavigate]);
 
   const deleteComment = useCallback(async (commentId: number) => {
-    const res = await fetch(`/api/comments/${commentId}`, { method: "DELETE" });
-    if (res.ok) {
-      setNotification("✓ 댓글이 삭제되었습니다.");
-      // Refresh current post
-      if (screen.type === "post") {
-        const postRes = await fetch(`/api/posts/${screen.postId}`);
-        const data = await postRes.json();
-        setCurrentPost(data);
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, { method: "DELETE" });
+      if (res.ok) {
+        setNotification("✓ 댓글이 삭제되었습니다.");
+        // Refresh current post
+        if (screen.type === "post") {
+          const postRes = await fetch(`/api/posts/${screen.postId}`);
+          const data = await postRes.json();
+          setCurrentPost(data);
+        }
+      } else {
+        const data = await res.json();
+        setNotification(data.error || "삭제 실패");
       }
-    } else {
-      const data = await res.json();
-      setNotification(data.error || "삭제 실패");
+    } finally {
+      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen]);
@@ -240,20 +279,25 @@ export default function Home() {
       setNotification("로그인이 필요합니다.");
       return;
     }
-    const res = await fetch("/api/comments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId, content }),
-    });
-    if (res.ok) {
-      setNotification("✓ 댓글이 등록되었습니다.");
-      // Refresh current post
-      const postRes = await fetch(`/api/posts/${postId}`);
-      const data = await postRes.json();
-      setCurrentPost(data);
-    } else {
-      const data = await res.json();
-      setNotification(data.error || "댓글 등록 실패");
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, content }),
+      });
+      if (res.ok) {
+        setNotification("✓ 댓글이 등록되었습니다.");
+        // Refresh current post
+        const postRes = await fetch(`/api/posts/${postId}`);
+        const data = await postRes.json();
+        setCurrentPost(data);
+      } else {
+        const data = await res.json();
+        setNotification(data.error || "댓글 등록 실패");
+      }
+    } finally {
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -262,38 +306,47 @@ export default function Home() {
       setNotification("로그인이 필요합니다.");
       return;
     }
-    const res = await fetch("/api/posts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ boardId, title, content }), // isNotice defaults to false
-    });
-    if (res.ok) {
-      setNotification("✓ 글이 등록되었습니다!");
-      handleNavigate({ type: "board", boardId, page: 1 });
-    } else {
-      const data = await res.json();
-      setNotification(data.error || "글 등록 실패");
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ boardId, title, content }), // isNotice defaults to false
+      });
+      if (res.ok) {
+        setNotification("✓ 글이 등록되었습니다!");
+        handleNavigate({ type: "board", boardId, page: 1 });
+      } else {
+        const data = await res.json();
+        setNotification(data.error || "글 등록 실패");
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, handleNavigate]);
 
   const toggleNotice = useCallback(async (postId: number, isNotice: boolean) => {
     if (!user || !user.isAdmin) return;
-    const res = await fetch(`/api/posts/${postId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isNotice }),
-    });
-    if (res.ok) {
-      setNotification(isNotice ? "★ 공지로 등록되었습니다." : "✓ 공지가 해제되었습니다.");
-      // Refresh current post if viewing it
-      if (screen.type === "post" && screen.postId === postId) {
-        const postRes = await fetch(`/api/posts/${postId}`);
-        const data = await postRes.json();
-        setCurrentPost(data);
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isNotice }),
+      });
+      if (res.ok) {
+        setNotification(isNotice ? "★ 공지로 등록되었습니다." : "✓ 공지가 해제되었습니다.");
+        // Refresh current post if viewing it
+        if (screen.type === "post" && screen.postId === postId) {
+          const postRes = await fetch(`/api/posts/${postId}`);
+          const data = await postRes.json();
+          setCurrentPost(data);
+        }
+      } else {
+        setNotification("공지 설정 실패");
       }
-      // Refresh board if viewing it (not strictly needed as it re-fetches on nav, but useful if we stay)
-    } else {
-      setNotification("공지 설정 실패");
+    } finally {
+      setIsLoading(false);
     }
   }, [user, screen]);
 
@@ -490,6 +543,27 @@ export default function Home() {
         </main>
 
         <CommandInput onCommand={handleCommand} isAdmin={user?.isAdmin || false} dimmed={dimmed} />
+      </div>
+
+      {isLoading && <ProcessingOverlay />}
+    </div>
+  );
+}
+
+// ===== Processing Overlay Component =====
+function ProcessingOverlay() {
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center z-[200] animate-fade-in">
+      <div className="bg-terminal-bg border-2 border-terminal-cyan px-8 py-6 flex flex-col items-center gap-4 shadow-[0_0_20px_rgba(0,255,255,0.3)]">
+        <div className="text-terminal-cyan animate-pulse font-bold tracking-[0.2em] text-lg">
+          PROCESSING...
+        </div>
+        <div className="flex gap-3">
+          <div className="w-2.5 h-2.5 bg-terminal-cyan animate-[bounce_1s_infinite_0ms]" />
+          <div className="w-2.5 h-2.5 bg-terminal-cyan animate-[bounce_1s_infinite_200ms]" />
+          <div className="w-2.5 h-2.5 bg-terminal-cyan animate-[bounce_1s_infinite_400ms]" />
+        </div>
+        <p className="text-terminal-darkgray text-xs mt-2 font-mono">PLEASE WAIT</p>
       </div>
     </div>
   );
