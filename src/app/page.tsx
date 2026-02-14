@@ -46,7 +46,8 @@ type Screen =
   | { type: "login" }
   | { type: "signup" }
   | { type: "terms" }
-  | { type: "myinfo" };
+  | { type: "myinfo" }
+  | { type: "privacy" };
 
 const POSTS_PER_PAGE = 10;
 
@@ -474,6 +475,7 @@ export default function Home() {
           {screen.type === "help" && <HelpScreen user={user} />}
           {screen.type === "about" && <AboutScreen />}
           {screen.type === "terms" && <TermsScreen onBack={() => setScreen({ type: "main" })} />}
+          {screen.type === "privacy" && <PrivacyScreen onBack={() => setScreen({ type: "main" })} />}
           {screen.type === "myinfo" && user && (
             <MyInfoScreen
               user={user}
@@ -550,8 +552,9 @@ function MainMenuScreen({
         <MenuItem number="2" label="하이컴 안내" onClick={() => onNavigate({ type: "about" })} />
         <MenuItem number="3" label="도움말" onClick={() => onNavigate({ type: "help" })} />
         <MenuItem number="4" label="이용약관" onClick={() => onNavigate({ type: "terms" })} />
+        <MenuItem number="5" label="개인정보처리방침" onClick={() => onNavigate({ type: "privacy" })} />
         {user && (
-          <MenuItem number="5" label="내 정보" onClick={() => onNavigate({ type: "myinfo" })} />
+          <MenuItem number="6" label="내 정보" onClick={() => onNavigate({ type: "myinfo" })} />
         )}
       </div>
 
@@ -1303,6 +1306,82 @@ function TermsScreen({ onBack }: { onBack: () => void }) {
           className="text-terminal-cyan hover:text-terminal-highlight"
         >
           [B] 뒤로가기 (또는 ESC)
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ===== Privacy Screen =====
+function PrivacyScreen({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="animate-fade-in flex flex-col h-full">
+      <SectionTitle>══ 개인정보처리방침 ══</SectionTitle>
+      <Divider />
+
+      <div className="flex-1 overflow-y-auto pr-2 text-sm leading-relaxed space-y-4 text-terminal-text">
+        <p className="font-bold text-terminal-highlight">
+          (주)하이시어는 정보주체의 자유와 권리 보호를 위해 「개인정보 보호법」 및 관계 법령이 정한 바를 준수합니다.
+        </p>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">1. 개인정보의 처리 목적</h3>
+          <p>회사는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며 이용 목적이 변경되는 경우에는 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
+          <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
+            <li>회원 가입 및 관리 (본인 식별, 가입 의사 확인)</li>
+            <li>서비스 제공 및 커뮤니티 운영</li>
+            <li>&apos;모의 주식 시뮬레이터&apos; 프로젝트 데이터 분석 (익명화 처리 후 사용)</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">2. 개인정보의 처리 및 보유 기간</h3>
+          <p>회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.</p>
+          <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
+            <li>보유 기간: <span className="text-terminal-highlight">회원 탈퇴 시까지</span> (탈퇴 즉시 파기)</li>
+            <li>단, 관계 법령 위반에 따른 수사·조사 등이 진행 중인 경우에는 해당 수사·조사 종료 시까지</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">3. 처리하는 개인정보의 항목</h3>
+          <p>회사는 다음의 개인정보 항목을 처리하고 있습니다.</p>
+          <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
+            <li>필수항목: 아이디, 비밀번호, 닉네임</li>
+            <li>자동수집항목: 서비스 이용 기록, 접속 로그, 쿠키, 접속 IP 정보</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">4. 정보주체의 권리·의무 및 그 행사 방법</h3>
+          <p>이용자는 개인정보주체로서 다음과 같은 권리를 행사할 수 있습니다.</p>
+          <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
+            <li>자신의 개인정보 조회 및 수정 (내 정보 메뉴)</li>
+            <li>회원 탈퇴 요청 (탈퇴 시 개인정보 즉시 파기)</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-terminal-cyan font-bold mb-1">5. 개인정보의 파기</h3>
+          <p>회사는 원칙적으로 개인정보 처리목적이 달성된 경우에는 지체 없이 해당 개인정보를 파기합니다. 파기의 절차, 기한 및 방법은 다음과 같습니다.</p>
+          <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
+            <li>파기절차: 이용자가 입력한 정보는 목적 달성 후 즉시 DB에서 삭제됩니다.</li>
+            <li>파기방법: 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용합니다.</li>
+          </ul>
+        </div>
+
+        <p className="text-terminal-gray text-xs mt-4">
+          공고일자: 2026년 2월 14일 / 시행일자: 2026년 2월 14일
+        </p>
+      </div>
+
+      <Divider />
+      <div className="mt-2">
+        <button
+          onClick={onBack}
+          className="text-terminal-cyan hover:text-terminal-highlight"
+        >
+          [B] 뒤로가기
         </button>
       </div>
     </div>
