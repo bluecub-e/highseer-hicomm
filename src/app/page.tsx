@@ -60,6 +60,20 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  // Dimmed mode state
+  const [dimmed, setDimmed] = useState(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("hicomm-dimmed");
+    if (saved === "true") setDimmed(true);
+  }, []);
+  const toggleDimmed = useCallback(() => {
+    setDimmed((prev) => {
+      const next = !prev;
+      localStorage.setItem("hicomm-dimmed", String(next));
+      return next;
+    });
+  }, []);
+
   // Board data state
   const [boardPosts, setBoardPosts] = useState<ApiPost[]>([]);
   const [boardTotal, setBoardTotal] = useState(0);
@@ -379,9 +393,9 @@ export default function Home() {
 
   // ===== Render =====
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="flex flex-col h-screen w-full max-w-4xl border-x-2 border-terminal-border bg-terminal-bg">
-        <StatusBar nickname={user?.nickname || null} />
+    <div className={`flex items-center justify-center min-h-screen bg-black ${dimmed ? "dimmed" : ""}`}>
+      <div className="flex flex-col h-screen-safe w-full max-w-4xl border-x-2 border-terminal-border bg-terminal-bg">
+        <StatusBar nickname={user?.nickname || null} dimmed={dimmed} onToggleDimmed={toggleDimmed} />
 
         {/* Notification Toast */}
         {notification && (
@@ -482,7 +496,8 @@ function MainMenuScreen({
   return (
     <div className="animate-fade-in">
       <div className="text-center py-4">
-        <pre className="text-terminal-cyan text-xs sm:text-sm leading-tight inline-block">
+        {/* Desktop ASCII art */}
+        <pre className="text-terminal-cyan text-sm leading-tight hidden sm:inline-block">
           {`
  ██╗  ██╗██╗ ██████╗ ██████╗ ███╗   ███╗███╗   ███╗
  ██║  ██║██║██╔════╝██╔═══██╗████╗ ████║████╗ ████║
@@ -492,6 +507,11 @@ function MainMenuScreen({
  ╚═╝  ╚═╝╚═╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝
 `}
         </pre>
+        {/* Mobile compact logo */}
+        <div className="sm:hidden">
+          <p className="text-terminal-cyan text-xl font-bold tracking-widest">★ HiComm ★</p>
+          <p className="text-terminal-cyan text-xs">하 이 컴</p>
+        </div>
         <p className="text-terminal-highlight text-sm mt-2">
           (주)하이시어 정보통신 서비스
         </p>
