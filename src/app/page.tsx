@@ -61,25 +61,19 @@ export default function Home() {
   // ===== History Integration =====
   const handleNavigate = useCallback((newScreen: Screen) => {
     setScreen(newScreen);
-    // Add query param to help browser distinguish states
-    const query = newScreen.type === "main" ? "" : `?screen=${newScreen.type}`;
-    // For board/post, might want more info in URL, but simple diff is enough for stack
-    window.history.pushState(newScreen, "", query);
+    window.history.pushState(newScreen, "", "");
   }, []);
 
   useEffect(() => {
-    // Only replace if no state exists (initial load), to avoid overwriting reload state
-    if (!window.history.state) {
-      window.history.replaceState({ type: "main" }, "", "");
-    } else {
-      // Restore state on load (e.g. refresh)
-      setScreen(window.history.state);
-    }
+    // Initial state replacement to ensure we have a state to pop back to
+    window.history.replaceState({ type: "main" }, "", "");
 
     const handlePopState = (event: PopStateEvent) => {
       if (event.state) {
+        // Restore screen from history state
         setScreen(event.state);
       } else {
+        // Fallback to main if no state (shouldn't happen with replaceState above, but safe fallback)
         setScreen({ type: "main" });
       }
     };
@@ -317,12 +311,7 @@ export default function Home() {
         return;
       }
       if (c === "b" || c === "뒤로" || c === "back") {
-        if (screen.type === "post") {
-          // Explicitly go to Board list as requested by user
-          handleNavigate({ type: "board", boardId: "free", page: 1 });
-        } else {
-          window.history.back();
-        }
+        window.history.back();
         return;
       }
       if (c === "h" || c === "도움" || c === "help" || c === "?") {
