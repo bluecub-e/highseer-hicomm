@@ -1371,8 +1371,18 @@ function TermsScreen({ onBack }: { onBack: () => void }) {
           <p>타인의 권리를 침해하거나 법령에 위반되는 게시물을 작성해서는 안 되며, 이에 대한 법적 책임은 작성자에게 있습니다.</p>
         </div>
 
+        <div className="border border-terminal-darkgray bg-terminal-bg-dark p-3">
+          <h3 className="text-terminal-highlight font-bold mb-2">[서비스 중단 및 면책]</h3>
+          <p className="mb-2">
+            1. 시스템 점검, 서버 이전, 기술적 오류, 천재지변 등 운영자가 통제할 수 없는 사유로 서비스가 일시 중단될 수 있습니다.
+          </p>
+          <p>
+            2. 무료 서비스의 특성상, 예기치 못한 장애나 인프라 환경 변화로 인한 데이터(게시글, 댓글, 유저 정보 등)의 소실에 대해 운영자는 복구 의무 및 손해배상 책임을 지지 않습니다.
+          </p>
+        </div>
+
         <p className="text-terminal-gray text-xs">
-          본 약관은 2026년 2월 13일부터 시행됩니다.
+          공고일자: 2026년 2월 15일 / 시행일자: 2026년 2월 22일
         </p>
       </div>
 
@@ -1449,11 +1459,12 @@ function PrivacyScreen({ onBack }: { onBack: () => void }) {
           <ul className="list-disc list-inside mt-1 pl-2 text-terminal-gray">
             <li>파기절차: 이용자가 입력한 정보는 목적 달성 후 즉시 DB에서 삭제됩니다.</li>
             <li>파기방법: 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용합니다.</li>
+            <li>기타: 서비스 인프라의 전면 개편, 데이터베이스 성능 문제 해결 등을 위해 부득이한 경우 예외적으로 전체 유저 데이터를 일괄 파기(Clean Start)할 수 있으며, 이 경우 사전에 공지합니다.</li>
           </ul>
         </div>
 
         <p className="text-terminal-gray text-xs mt-4">
-          공고일자: 2026년 2월 14일 / 시행일자: 2026년 2월 14일
+          공고일자: 2026년 2월 15일 / 시행일자: 2026년 2월 22일
         </p>
       </div>
 
